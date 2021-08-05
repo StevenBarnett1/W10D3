@@ -44,12 +44,13 @@ async function getRecipeById(id) {
   // directive. The general form for calling and of the "find" methods with
   // eager loading looks like this.
   //
-  let recipe = Recipe.findByPk(id,{
+  let recipe = await Recipe.findByPk(id,{
     include:[
-      {Ingredient, include: [Ingredient.MeasurementUnit] },
+      {model: Ingredient, include: [MeasurementUnit] },
       Instruction
     ]
-  })
+  });
+  return recipe;
   //
   // Look at the data model in the instructions to see the relations between the
   // Recipe table and the Ingredients and Instructions table. Figure out which
@@ -74,6 +75,8 @@ async function deleteRecipe(id) {
   // destroy it. Or, use the Model.destroy({ ... where ... }) method that you
   // saw in the video.
   //
+    const toBeDeleted = await Recipe.findByPk(id);
+    await toBeDeleted.destroy();
   // Docs: https://sequelize.org/master/class/lib/model.js~Model.html#instance-method-destroy
 }
 
@@ -81,13 +84,24 @@ async function createNewRecipe(title) {
   // Use the create method of the Recipe object to create a new object and
   // return it.
   //
+  return await Recipe.create({
+     "title": title
+  });
   // Docs: https://sequelize.org/v5/manual/instances.html#creating-persistent-instances
 }
 
 async function searchRecipes(term) {
   // Use the findAll method of the Recipe object to search for recipes with the
   // given term in its title
-  //
+  let results = await Recipe.findAll({
+    where: {
+        title: {
+            [Op.like]: term
+        }
+    }
+});
+console.log('Results -->', results);
+return results;
   // Docs: https://sequelize.org/v5/manual/querying.html
 }
 
