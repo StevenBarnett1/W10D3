@@ -29,9 +29,8 @@ async function getTenNewestRecipes() {
   //
   // The general form of this is
   //
-  // Model.findAll({
-  //     { ... specify your options here... }
-  // });
+  const recipes = await Recipe.findAll({order:[["createdAt", "desc"]],limit:10})
+  return recipes
   //
   // Docs: https://sequelize.org/master/class/lib/model.js~Model.html#static-method-findAll
 }
@@ -45,15 +44,12 @@ async function getRecipeById(id) {
   // directive. The general form for calling and of the "find" methods with
   // eager loading looks like this.
   //
-  // Model.findByPk(id, {
-  //   include: [
-  //     firstDataModel,
-  //     {
-  //       model: secondDataModel,
-  //       include: [thirdDataModel]
-  //     }
-  //   ]
-  // });
+  let recipe = Recipe.findByPk(id,{
+    include:[
+      {Ingredient, include: [Ingredient.MeasurementUnit] },
+      Instruction
+    ]
+  })
   //
   // Look at the data model in the instructions to see the relations between the
   // Recipe table and the Ingredients and Instructions table. Figure out which
